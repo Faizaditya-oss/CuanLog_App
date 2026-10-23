@@ -6,6 +6,7 @@ import Transactions from './pages/Transactions'
 import PlaceholderPage from './pages/PlaceholderPage'
 import AuthPage from './pages/AuthPage'
 import ProtectedRoute from './components/ProtectedRoute'
+import Budgets from './pages/Budgets'
 
 function App() {
   return (
@@ -17,16 +18,10 @@ function App() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="transactions" element={<Transactions />} />
+          <Route path="budgets" element={<Budgets />} />
 
-          <Route
-            path="budgets"
-            element={
-              <PlaceholderPage
-                title="Anggaran"
-                description="Atur batas pengeluaran berdasarkan kategori dan periode."
-              />
-            }
-          />
+
+
 
           <Route
             path="reports"
