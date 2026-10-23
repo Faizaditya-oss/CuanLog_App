@@ -297,30 +297,57 @@ function Dashboard() {
                 </div>
 
                 <div className="divide-y divide-slate-100">
-                    {transactions.map(({ name, category, date, amount, icon: Icon, color }) => (
-                        <div
-                            key={`${name}-${date}`}
-                            className="flex items-center gap-3 px-5 py-4 sm:px-6"
-                        >
-                            <div className={`rounded-xl p-3 ${color}`}>
-                                <Icon size={20} />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm font-semibold text-slate-800">
-                                    {name}
-                                </p>
-                                <p className="mt-1 text-xs text-slate-400">
-                                    {category} · {date}
-                                </p>
-                            </div>
-                            <p
-                                className={`shrink-0 text-right text-sm font-semibold ${amount > 0 ? 'text-emerald-700' : 'text-slate-800'
-                                    }`}
-                            >
-                                {amount > 0 ? '+' : '-'}{rupiah(Math.abs(amount))}
-                            </p>
-                        </div>
-                    ))}
+                    {/* Daftar Transaksi Terbaru */}
+                    {loading ? (
+                        <p className="px-5 py-8 text-center text-sm text-slate-500">
+                            Memuat transaksi...
+                        </p>
+                    ) : error ? (
+                        <p className="px-5 py-8 text-center text-sm text-rose-600">
+                            {error}
+                        </p>
+                    ) : transactions.length === 0 ? (
+                        <p className="px-5 py-8 text-center text-sm text-slate-500">
+                            Belum ada transaksi. Yuk, catat transaksi pertamamu!
+                        </p>
+                    ) : (
+                        transactions.slice(0, 5).map((item) => {
+                            const isIncome = item.type === 'income'
+                            const Icon = isIncome ? ArrowDownLeft : ArrowUpRight
+                            const color = isIncome
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'bg-rose-50 text-rose-600'
+
+                            return (
+                                <div
+                                    key={item.id}
+                                    className="flex items-center gap-3 px-5 py-4 sm:px-6"
+                                >
+                                    <div className={`rounded-xl p-3 ${color}`}>
+                                        <Icon size={20} />
+                                    </div>
+
+                                    <div className="min-w-0 flex-1">
+                                        <p className="truncate text-sm font-semibold text-slate-800">
+                                            {item.name}
+                                        </p>
+
+                                        <p className="mt-1 text-xs text-slate-400">
+                                            {item.category} · {item.date}
+                                        </p>
+                                    </div>
+
+                                    <p
+                                        className={`shrink-0 text-right text-sm font-semibold ${isIncome ? 'text-emerald-700' : 'text-slate-800'
+                                            }`}
+                                    >
+                                        {isIncome ? '+' : '-'}
+                                        {rupiah(Number(item.amount))}
+                                    </p>
+                                </div>
+                            )
+                        })
+                    )}
                 </div>
             </section>
         </div>
