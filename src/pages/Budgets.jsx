@@ -202,6 +202,57 @@ export default function Budgets() {
         setSuccess('Anggaran berhasil disimpan.')
     }
 
+
+    function handleEditStart(budget) {
+        setEditingId(budget.id)
+        setEditAmount(String(budget.amount))
+        setError('')
+        setSuccess('')
+    }
+
+    function handleEditCancel() {
+        setEditingId(null)
+        setEditAmount('')
+    }
+
+    async function handleUpdate(id) {
+        const numericAmount = Number(editAmount)
+
+        setError('')
+        setSuccess('')
+
+        if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+            setError('Batas anggaran harus lebih besar dari Rp0.')
+            return
+        }
+
+        setUpdating(true)
+
+        const { data, error } = await supabase
+            .from('budgets')
+            .update({ amount: numericAmount })
+            .eq('id', id)
+            .eq('user_id', user.id)
+            .select()
+            .single()
+
+        setUpdating(false)
+
+        if (error) {
+            console.error('Gagal memperbarui anggaran:', error)
+            setError(`Gagal memperbarui anggaran: ${error.message}`)
+            return
+        }
+
+        setBudgets((current) =>
+            current.map((item) => item.id === id ? data : item)
+        )
+
+        setEditingId(null)
+        setEditAmount('')
+        setSuccess('Anggaran berhasil diperbarui.')
+    }
+
     async function handleDelete(id) {
         const confirmed = window.confirm(
             'Yakin ingin menghapus anggaran ini?',
@@ -420,15 +471,35 @@ export default function Budgets() {
                             return (
                                 <div key={budget.id} className="p-5 sm:p-6">
                                     <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+
                                         <div>
                                             <h3 className="font-semibold text-slate-800">
                                                 {budget.category}
                                             </h3>
+
                                             <p className="mt-1 text-sm text-slate-500">
-                                                Terpakai {rupiah(spent)} dari{' '}
-                                                {rupiah(limit)}
+                                                Terpakai {rupiah(spent)} dari
                                             </p>
+
+                                            {editingId === budget.id ? (
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    step="1"
+                                                    value={editAmount}
+                                                    onChange={(event) =>
+                                                        setEditAmount(event.target.value)
+                                                    }
+                                                    aria-label={`Batas anggaran ${budget.category}`}
+                                                    className="mt-2 w-full max-w-xs rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                                                />
+                                            ) : (
+                                                <p className="mt-1 font-semibold text-slate-800">
+                                                    {rupiah(limit)}
+                                                </p>
+                                            )}
                                         </div>
+
 
                                         <div className="flex items-center gap-3">
                                             <span
@@ -441,6 +512,19 @@ export default function Budgets() {
                                             >
                                                 {Math.round(percentage)}%
                                             </span>
+
+                                            {/* Tombol Edit */}
+                                            <button
+                                                type="button"
+                                                onClick={() => handleEditStart(budget)}
+                                                disabled={updating || deletingId === budget.id}
+                                                aria-label={`Edit anggaran ${budget.category}`}
+                                                className="rounded-lg p-2 text-blue-500 transition hover:bg-blue-50 hover:text-blue-700 disabled:opacity-50"
+                                            >
+                                                <Pencil size={18} />
+                                            </button>
+
+                                            {/* Tombol Hapus */}
                                             <button
                                                 type="button"
                                                 onClick={() =>
