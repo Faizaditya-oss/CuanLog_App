@@ -262,7 +262,8 @@ function Dashboard() {
                             <div>
                                 <p className="text-sm text-slate-500">Saldo tersisa</p>
                                 <p className="mt-1 text-lg font-bold text-slate-900">
-                                    {rupiah(900000)}
+                                    {/* Saldo sesuai database */}
+                                    {rupiah(balance)}
                                 </p>
                             </div>
                             <div className="rounded-xl bg-emerald-50 p-3 text-emerald-700">
